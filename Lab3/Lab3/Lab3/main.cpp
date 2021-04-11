@@ -1,7 +1,7 @@
-﻿#include <vector>
+﻿#include <iostream>
+#include <vector>
 #include <fstream>
 #include <iomanip>
-#include <iostream>
 #include <stack>
 #include <queue>
 
