@@ -101,13 +101,15 @@ void bestFirstSearch(vector<vector<int>> directWays, vector<vector<int>> roads, 
 {
 	vector<int> closed;
 	vector<int> open;
-	int from[15], f[15];
+	int from[15], g[15], f[15];
 	for(int i=0;i<15;i++)
 	{
 		from[i]=-1;
+		g[i]=INT_MAX;
 		f[i]=INT_MAX;
 	}
 	open.push_back(start);
+	g[start]=0;
 	f[start]=directWays[start][end];
 	while(!open.empty())
 	{
@@ -133,6 +135,7 @@ void bestFirstSearch(vector<vector<int>> directWays, vector<vector<int>> roads, 
 				way.pop();
 			}
 			cout<<endl;
+			cout<<"Length: "<<g[current]<<endl;
 			return;
 		}
 		for(int i=0;i<open.size();i++)
@@ -150,14 +153,16 @@ void bestFirstSearch(vector<vector<int>> directWays, vector<vector<int>> roads, 
 			vector<int>::iterator it2;
 			if((roads[current][i]!=0)&&(it==closed.end()))
 			{
+				g[i]=g[current]+roads[current][i];
 				f[i]=directWays[i][end];
 				it2=find(open.begin(), open.end(), i);
 				if(it2==open.end())
 					open.push_back(i);
 				from[i]=current;
 			}
-			else if(directWays[i][end]<f[i])
+			else if(g[current]+roads[current][i]<g[i])
 			{
+				g[i]=g[current]+roads[current][i];
 				f[i]=directWays[i][end];
 				from[i]=current;
 			}
