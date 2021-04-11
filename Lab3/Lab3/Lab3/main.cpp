@@ -10,6 +10,7 @@ vector<vector<int>> readDirectDistances();
 vector<vector<int>> readRoadDistances();
 vector<string> readCities();
 void printMatrix(vector<vector<int>>);
+void bestFirstSearch(vector<vector<int>> directWays, vector<vector<int>> roads, vector<string> cities, int start, int end);
 void AStar(vector<vector<int>> directWays, vector<vector<int>> roads, vector<string> cities, int start, int end);
 
 int main()
@@ -29,9 +30,23 @@ int main()
 			index2=i;
 	}
 	if((index1!=-1)&&(index2!=-1))
-		AStar(directDistances, roadDistances, cities, index1, index2);
+	{
+		cout<<"Best-first search(0) or A*(1)?"<<endl;
+		int choice;
+		cin>>choice;
+		if(choice==0)
+		{
+			bestFirstSearch(directDistances, roadDistances, cities, index1, index2);
+		}
+		else
+		{
+			AStar(directDistances, roadDistances, cities, index1, index2);
+		}
+	}
 	else
+	{
 		cout<<"No such cities!"<<endl;
+	}
 }
 
 vector<vector<int>> readDirectDistances()
@@ -78,6 +93,72 @@ void printMatrix(vector<vector<int>> matrix)
 	cout<<endl;
 }
 
+void bestFirstSearch(vector<vector<int>> directWays, vector<vector<int>> roads, vector<string> cities, int start, int end)
+{
+	vector<int> closed;
+	vector<int> open;
+	int from[15], g[15], f[15];
+	for(int i=0;i<15;i++)
+	{
+		from[i]=-1;
+		g[i]=INT_MAX;
+		f[i]=INT_MAX;
+	}
+	open.push_back(start);
+	g[start]=0;
+	f[start]=g[start]+directWays[start][end];
+	while(!open.empty())
+	{
+		int current=open[0];
+		for(int i=1;i<open.size();i++)
+		{
+			if(f[open[i]]<f[current]) current=open[i];
+		}
+		if(current==end)
+		{
+			stack<int>way;
+			int verticle=end;			
+			while(verticle!=start)
+			{	
+				way.push(verticle);
+				verticle=from[verticle];
+			}
+			way.push(start);
+			while(!way.empty())
+			{
+				cout<<cities[way.top()];
+				if(way.top()!=end) cout<<'-';
+				way.pop();
+			}
+			return;
+		}
+		for(int i=0;i<open.size();i++)
+		{
+			if(open[i]==current) 
+			{
+				open.erase(open.begin()+i);
+			}
+		}
+		closed.push_back(current);
+		for(int i=0;i<15;i++)
+		{
+			vector<int>::iterator it;
+			it=find(closed.begin(), closed.end(), i);
+			vector<int>::iterator it2;
+			it2=find(open.begin(), open.end(), i);
+			int temp_g=g[current]+roads[current][i];
+			if((roads[current][i]!=0)&&(it==closed.end())&&(it2==open.end()))
+			{
+				g[i]=temp_g;
+				open.push_back(i);
+				from[i]=current;
+			}
+		}
+	}
+	cout<<"Fail! Way is not found!"<<endl;
+	
+}
+
 void AStar(vector<vector<int>> directWays, vector<vector<int>> roads, vector<string> cities, int start, int end)
 {
 	vector<int> closed;
@@ -95,7 +176,6 @@ void AStar(vector<vector<int>> directWays, vector<vector<int>> roads, vector<str
 	while(!open.empty())
 	{
 		int current=open[0];
-		
 		for(int i=1;i<open.size();i++)
 		{
 			if(f[open[i]]<f[current]) current=open[i];

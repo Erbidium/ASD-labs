@@ -1,4 +1,6 @@
 ﻿  main.cpp
-C:\Users\Acer\Documents\C++Labs\ASD_labs\ASD-labs\Lab3\Lab3\Lab3\main.cpp(107,16): warning C4018: <: несоответствие типов со знаком и без знака
-C:\Users\Acer\Documents\C++Labs\ASD_labs\ASD-labs\Lab3\Lab3\Lab3\main.cpp(129,16): warning C4018: <: несоответствие типов со знаком и без знака
+C:\Users\Acer\Documents\C++Labs\ASD_labs\ASD-labs\Lab3\Lab3\Lab3\main.cpp(113,16): warning C4018: <: несоответствие типов со знаком и без знака
+C:\Users\Acer\Documents\C++Labs\ASD_labs\ASD-labs\Lab3\Lab3\Lab3\main.cpp(135,16): warning C4018: <: несоответствие типов со знаком и без знака
+C:\Users\Acer\Documents\C++Labs\ASD_labs\ASD-labs\Lab3\Lab3\Lab3\main.cpp(179,16): warning C4018: <: несоответствие типов со знаком и без знака
+C:\Users\Acer\Documents\C++Labs\ASD_labs\ASD-labs\Lab3\Lab3\Lab3\main.cpp(201,16): warning C4018: <: несоответствие типов со знаком и без знака
   Lab3.vcxproj -> C:\Users\Acer\Documents\C++Labs\ASD_labs\ASD-labs\Lab3\Lab3\Debug\Lab3.exe
