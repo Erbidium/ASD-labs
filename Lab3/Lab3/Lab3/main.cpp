@@ -150,21 +150,20 @@ void bestFirstSearch(vector<vector<int>> directWays, vector<vector<int>> roads, 
 		{
 			vector<int>::iterator it;
 			it=find(closed.begin(), closed.end(), i);
-			vector<int>::iterator it2;
 			if((roads[current][i]!=0)&&(it==closed.end()))
 			{
-				g[i]=g[current]+roads[current][i];
-				f[i]=directWays[i][end];
+				vector<int>::iterator it2;
 				it2=find(open.begin(), open.end(), i);
+				if((it2==open.end())||(g[current]+roads[current][i]<g[i]))
+				{
+					from[i]=current;
+					g[i]=g[current]+roads[current][i];
+					f[i]=directWays[i][end];
+				}
 				if(it2==open.end())
+				{
 					open.push_back(i);
-				from[i]=current;
-			}
-			else if(g[current]+roads[current][i]<g[i])
-			{
-				g[i]=g[current]+roads[current][i];
-				f[i]=directWays[i][end];
-				from[i]=current;
+				}	
 			}
 		}
 	}
