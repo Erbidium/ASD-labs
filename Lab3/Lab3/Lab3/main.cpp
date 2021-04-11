@@ -3,21 +3,30 @@
 #include <iomanip>
 #include <iostream>
 #include <stack>
+#include <queue>
 
 using namespace std;
 
-vector<vector<int>> readDirectDistances();
-vector<vector<int>> readRoadDistances();
-vector<string> readCities();
+vector<vector<int>> readDirectDistances(int numberCities);
+vector<vector<int>> readRoadDistances(int numberCities);
+vector<string> readCities(int numberOfCities, string country);
 void printMatrix(vector<vector<int>>);
 void bestFirstSearch(vector<vector<int>> directWays, vector<vector<int>> roads, vector<string> cities, int start, int end);
 void AStar(vector<vector<int>> directWays, vector<vector<int>> roads, vector<string> cities, int start, int end);
+void printResults(int start, int end, vector<int> from, vector<string> cities, int length);
 
 int main()
 {
-	vector<vector<int>> directDistances=readDirectDistances();
-	vector<vector<int>> roadDistances=readRoadDistances();
-	vector<string> cities=readCities();
+	cout<<"Enter country:\n";
+	string country;
+	cin>>country;
+	int numberOfCities;
+	cout<<"Enter number of cities:\n";
+	cin>>numberOfCities;
+	vector<vector<int>> directDistances=readDirectDistances(numberOfCities);
+	vector<vector<int>> roadDistances=readRoadDistances(numberOfCities);
+	
+	vector<string> cities=readCities(numberOfCities, country);
 	cout<<"Enter two cities:\n";
 	string city1, city2;
 	cin>>city1>>city2;
@@ -49,38 +58,38 @@ int main()
 	}
 }
 
-vector<vector<int>> readDirectDistances()
+vector<vector<int>> readDirectDistances(int numberCities)
 {
 	ifstream inFile("C:/Users/Acer/Documents/PythonLabs/distances/direct.txt");
-	vector<vector<int>> directDistances(15, vector<int>(15));
-	for(int i=0;i<15;i++)
+	vector<vector<int>> directDistances(numberCities, vector<int>(numberCities));
+	for(int i=0;i<numberCities;i++)
 	{
-		for(int j=0;j<15;j++)
+		for(int j=0;j<numberCities;j++)
 			inFile>>directDistances[i][j];
 	}
 	return directDistances;
 }
 
-vector<vector<int>> readRoadDistances()
+vector<vector<int>> readRoadDistances(int numberCities)
 {
 	ifstream inFile("C://Users/Acer/Documents/PythonLabs/distances/roads.txt");
-	vector<vector<int>> roadDistances(15, vector<int>(15));
-	for(int i=0;i<15;i++)
+	vector<vector<int>> roadDistances(numberCities, vector<int>(numberCities));
+	for(int i=0;i<numberCities;i++)
 	{
-		for(int j=0;j<15;j++)
+		for(int j=0;j<numberCities;j++)
 			inFile>>roadDistances[i][j];
 	}
 	return roadDistances;
 }
 
-vector<string> readCities()
+vector<string> readCities(int numberOfCities, string country)
 {
-	vector<string> cities(15);
+	vector<string> cities(numberOfCities);
 	ifstream inFile("D:/Навчання/1 курс/2 семестр/АСД/Лаб3/cities.txt");
-	for(int i=0;i<15;i++)
+	for(int i=0;i<numberOfCities;i++)
 	{
 		inFile>>cities[i];
-		int position=cities[i].find(",Norway");
+		int position=cities[i].find(","+country);
 		if(position!=string::npos) cities[i].erase(position);
 	}
 	return cities;
@@ -88,9 +97,9 @@ vector<string> readCities()
 
 void printMatrix(vector<vector<int>> matrix)
 {
-	for(int i=0;i<15;i++)
+	for(int i=0;i<matrix.size();i++)
 	{
-		for(int j=0;j<15;j++)
+		for(int j=0;j<matrix[i].size();j++)
 			cout<<setw(4)<<matrix[i][j]<<" ";
 		cout<<endl;
 	}
@@ -99,148 +108,94 @@ void printMatrix(vector<vector<int>> matrix)
 
 void bestFirstSearch(vector<vector<int>> directWays, vector<vector<int>> roads, vector<string> cities, int start, int end)
 {
-	vector<int> closed;
-	vector<int> open;
-	int from[15], g[15], f[15];
-	for(int i=0;i<15;i++)
-	{
-		from[i]=-1;
-		g[i]=INT_MAX;
-		f[i]=INT_MAX;
-	}
-	open.push_back(start);
+	int numberOfCities=cities.size();
+	priority_queue<pair<int,int>> open;
+	vector<int> from(numberOfCities, -1), g(numberOfCities, INT_MAX), f(numberOfCities, INT_MAX);
+	vector<bool>isOpen(numberOfCities, true);
 	g[start]=0;
 	f[start]=directWays[start][end];
+	auto startVerticle=make_pair(-f[start], start);
+	open.push(startVerticle);
 	while(!open.empty())
 	{
-		int current=open[0];
-		for(int i=1;i<open.size();i++)
+		auto current=open.top();
+		open.pop();
+		if(isOpen[current.second]==false)
+			continue;
+		isOpen[current.second]=false;
+		if(current.second==end)
 		{
-			if(f[open[i]]<f[current]) current=open[i];
-		}
-		if(current==end)
-		{
-			stack<int>way;
-			int verticle=end;			
-			while(verticle!=start)
-			{	
-				way.push(verticle);
-				verticle=from[verticle];
-			}
-			way.push(start);
-			while(!way.empty())
-			{
-				cout<<cities[way.top()];
-				if(way.top()!=end) cout<<'-';
-				way.pop();
-			}
-			cout<<endl;
-			cout<<"Length: "<<g[current]<<endl;
+			printResults(start, end, from, cities, g[current.second]);
 			return;
 		}
-		for(int i=0;i<open.size();i++)
+		for(int i=0;i<numberOfCities;i++)
 		{
-			if(open[i]==current) 
+			if((roads[current.second][i]!=0)&&(isOpen[i]==true)&&(g[current.second]+roads[current.second][i]<g[i]))
 			{
-				open.erase(open.begin()+i);
-			}
-		}
-		closed.push_back(current);
-		for(int i=0;i<15;i++)
-		{
-			vector<int>::iterator it;
-			it=find(closed.begin(), closed.end(), i);
-			if((roads[current][i]!=0)&&(it==closed.end()))
-			{
-				vector<int>::iterator it2;
-				it2=find(open.begin(), open.end(), i);
-				if((it2==open.end())||(g[current]+roads[current][i]<g[i]))
-				{
-					from[i]=current;
-					g[i]=g[current]+roads[current][i];
-					f[i]=directWays[i][end];
-				}
-				if(it2==open.end())
-				{
-					open.push_back(i);
-				}	
+				from[i]=current.second;
+				g[i]=g[current.second]+roads[current.second][i];
+				f[i]=directWays[i][end];
+				open.push(make_pair(-f[i], i));
 			}
 		}
 	}
 	cout<<"Fail! Way is not found!"<<endl;
-	
 }
 
 void AStar(vector<vector<int>> directWays, vector<vector<int>> roads, vector<string> cities, int start, int end)
 {
-	vector<int> closed;
-	vector<int> open;
-	int from[15], g[15], f[15];
-	for(int i=0;i<15;i++)
-	{
-		from[i]=-1;
-		g[i]=INT_MAX;
-		f[i]=INT_MAX;
-	}
-	open.push_back(start);
+	int numberOfCities=cities.size();
+	priority_queue<pair<int,int>> open;
+	vector<int> from(numberOfCities, -1), g(numberOfCities, INT_MAX), f(numberOfCities, INT_MAX);
+	vector<bool>isOpen(numberOfCities, true);
 	g[start]=0;
 	f[start]=g[start]+directWays[start][end];
+	auto startVerticle=make_pair(-f[start], start);
+	open.push(startVerticle);
 	while(!open.empty())
 	{
-		int current=open[0];
-		for(int i=1;i<open.size();i++)
+		auto current=open.top();
+		open.pop();
+		if(isOpen[current.second]==false)
+			continue;
+		isOpen[current.second]=false;
+		if(current.second==end)
 		{
-			if(f[open[i]]<f[current]) current=open[i];
-		}
-		if(current==end)
-		{
-			stack<int>way;
-			int verticle=end;			
-			while(verticle!=start)
-			{	
-				way.push(verticle);
-				verticle=from[verticle];
-			}
-			way.push(start);
-			while(!way.empty())
-			{
-				cout<<cities[way.top()];
-				if(way.top()!=end) cout<<'-';
-				way.pop();
-			}
-			cout<<endl;
-			cout<<"Length: "<<g[current]<<endl;
+			printResults(start, end, from, cities, g[current.second]);
 			return;
 		}
-		for(int i=0;i<open.size();i++)
+		for(int i=0;i<numberOfCities;i++)
 		{
-			if(open[i]==current) 
+			if((roads[current.second][i]!=0)&&(isOpen[i]==true)&&(g[current.second]+roads[current.second][i]<g[i]))
 			{
-				open.erase(open.begin()+i);
-			}
-		}
-		closed.push_back(current);
-		for(int i=0;i<15;i++)
-		{
-			vector<int>::iterator it;
-			it=find(closed.begin(), closed.end(), i);
-			if((roads[current][i]!=0)&&(it==closed.end()))
-			{
-				int temp_g=g[current]+roads[current][i];
-				vector<int>::iterator it2;
-				it2=find(open.begin(), open.end(), i);
-				if((it2==open.end())||(temp_g<g[i]))
-				{
-					from[i]=current;
-					g[i]=temp_g;
-					f[i]=g[i]+directWays[i][end];
-				}
-				if(it2==open.end()) 
-				{
-					open.push_back(i);
-				}
+				from[i]=current.second;
+				g[i]=g[current.second]+roads[current.second][i];
+				f[i]=g[i]+directWays[i][end];
+				open.push(make_pair(-f[i], i));
 			}
 		}
 	}
 	cout<<"Fail! Way is not found!"<<endl;
+}
+
+void printResults(int start, int end, vector<int> from, vector<string> cities, int length)
+{
+	cout<<cities[start]<<'-'<<cities[end]<<endl;
+	cout<<"Length: "<<length<<endl;
+	cout<<"Route: ";
+	stack<int>way;
+	int verticle=end;
+	while(verticle!=start)
+	{	
+		way.push(verticle);
+		verticle=from[verticle];
+	}
+	way.push(start);
+	while(!way.empty())
+	{
+		cout<<cities[way.top()];
+		if(way.top()!=end) cout<<'-';
+		way.pop();
+	}
+	cout<<endl;	
 }
