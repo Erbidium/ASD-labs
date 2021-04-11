@@ -60,7 +60,7 @@ int main()
 
 vector<vector<int>> readDirectDistances(int numberCities)
 {
-	ifstream inFile("C:/Users/Acer/Documents/PythonLabs/distances/direct.txt");
+	ifstream inFile("direct.txt");
 	vector<vector<int>> directDistances(numberCities, vector<int>(numberCities));
 	for(int i=0;i<numberCities;i++)
 	{
@@ -72,7 +72,7 @@ vector<vector<int>> readDirectDistances(int numberCities)
 
 vector<vector<int>> readRoadDistances(int numberCities)
 {
-	ifstream inFile("C://Users/Acer/Documents/PythonLabs/distances/roads.txt");
+	ifstream inFile("roads.txt");
 	vector<vector<int>> roadDistances(numberCities, vector<int>(numberCities));
 	for(int i=0;i<numberCities;i++)
 	{
@@ -85,7 +85,7 @@ vector<vector<int>> readRoadDistances(int numberCities)
 vector<string> readCities(int numberOfCities, string country)
 {
 	vector<string> cities(numberOfCities);
-	ifstream inFile("D:/Навчання/1 курс/2 семестр/АСД/Лаб3/cities.txt");
+	ifstream inFile("cities.txt");
 	for(int i=0;i<numberOfCities;i++)
 	{
 		inFile>>cities[i];
