@@ -78,7 +78,11 @@ vector<string> readCities()
 	vector<string> cities(15);
 	ifstream inFile("D:/Навчання/1 курс/2 семестр/АСД/Лаб3/cities.txt");
 	for(int i=0;i<15;i++)
+	{
 		inFile>>cities[i];
+		int position=cities[i].find(",Norway");
+		if(position!=string::npos) cities[i].erase(position);
+	}
 	return cities;
 }
 
@@ -97,16 +101,14 @@ void bestFirstSearch(vector<vector<int>> directWays, vector<vector<int>> roads, 
 {
 	vector<int> closed;
 	vector<int> open;
-	int from[15], g[15], f[15];
+	int from[15], f[15];
 	for(int i=0;i<15;i++)
 	{
 		from[i]=-1;
-		g[i]=INT_MAX;
 		f[i]=INT_MAX;
 	}
 	open.push_back(start);
-	g[start]=0;
-	f[start]=g[start]+directWays[start][end];
+	f[start]=directWays[start][end];
 	while(!open.empty())
 	{
 		int current=open[0];
@@ -130,6 +132,7 @@ void bestFirstSearch(vector<vector<int>> directWays, vector<vector<int>> roads, 
 				if(way.top()!=end) cout<<'-';
 				way.pop();
 			}
+			cout<<endl;
 			return;
 		}
 		for(int i=0;i<open.size();i++)
@@ -145,12 +148,17 @@ void bestFirstSearch(vector<vector<int>> directWays, vector<vector<int>> roads, 
 			vector<int>::iterator it;
 			it=find(closed.begin(), closed.end(), i);
 			vector<int>::iterator it2;
-			it2=find(open.begin(), open.end(), i);
-			int temp_g=g[current]+roads[current][i];
-			if((roads[current][i]!=0)&&(it==closed.end())&&(it2==open.end()))
+			if((roads[current][i]!=0)&&(it==closed.end()))
 			{
-				g[i]=temp_g;
-				open.push_back(i);
+				f[i]=directWays[i][end];
+				it2=find(open.begin(), open.end(), i);
+				if(it2==open.end())
+					open.push_back(i);
+				from[i]=current;
+			}
+			else if(directWays[i][end]<f[i])
+			{
+				f[i]=directWays[i][end];
 				from[i]=current;
 			}
 		}
@@ -196,6 +204,8 @@ void AStar(vector<vector<int>> directWays, vector<vector<int>> roads, vector<str
 				if(way.top()!=end) cout<<'-';
 				way.pop();
 			}
+			cout<<endl;
+			cout<<"Length: "<<g[current]<<endl;
 			return;
 		}
 		for(int i=0;i<open.size();i++)
