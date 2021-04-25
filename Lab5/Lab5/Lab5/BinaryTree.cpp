@@ -6,69 +6,33 @@ using namespace std;
 
 void printBT(const std::string& prefix, const Node* node, bool isLeft);
 
+BinaryTree::BinaryTree():root(nullptr)
+{}
+
 BinaryTree::~BinaryTree()
 {
 	delete root;
 }
 
-void BinaryTree::buildTree(std::vector<int> arr)
+Node* BinaryTree::getRoot()
 {
-	root=new Node(arr[0]);
-	if(arr.size()>1)
-	{
-		int n=arr.size(), nleft=n/2, nright=n-nleft-1;
-		root->left=new Node(arr[1]);
-		nleft--;
-		if(arr.size()>2)
-		{
-			root->right=new Node(arr[2]);
-			nright--;
-			int index=3;
-			stack<Node*> leftTree, rightTree;
-			leftTree.push(root->left);
-			rightTree.push(root->right);
-			while((nleft!=0)&&(leftTree.empty()!=true))
-			{
-				Node *current=leftTree.top();
-				leftTree.pop();
-				if(index<n)
-				{
-					current->left=new Node(arr[index]);
-					nleft--;
-					index++;
-					leftTree.push(current->left);
-				}
-				if((index<n)&&(nleft>0))
-				{
-					current->right=new Node(arr[index]);
-					nleft--;
-					index++;
-					leftTree.push(current->right);
-				}
+	return root;
+}
 
-				
-			}
-			while((nright!=0)&&(rightTree.empty()!=true))
-			{
-				Node *current=rightTree.top();
-				rightTree.pop();
-				if(index<n)
-				{
-					current->left=new Node(arr[index]);
-					nright--;
-					index++;
-					rightTree.push(current->left);
-				}
-				if((index<n)&&(nleft>0))
-				{
-					nright--;
-					current->right=new Node(arr[index]);
-					index++;
-					rightTree.push(current->right);
-				}
-			}
-		}
-	}
+void BinaryTree::setRoot(Node* newRoot)
+{
+	root=newRoot;
+}
+
+Node* BinaryTree::makeTree(std::vector<int> arr, int from, int n)
+{
+	if(n==0) return nullptr;
+	Node * p=new Node(arr[from]);
+	int nl=n/2;
+	int nr=n-nl-1;
+	p->left=makeTree(arr, from+1, nl);
+	p->right=makeTree(arr, from+1+nl, nr);
+	return p;
 }
 
 void BinaryTree::printTree(const string& prefix, Node* node, bool isLeft) {

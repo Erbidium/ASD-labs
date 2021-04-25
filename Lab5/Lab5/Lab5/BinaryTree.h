@@ -7,9 +7,10 @@ class BinaryTree
 {
     Node * root;
 public:
-    BinaryTree():root(nullptr){}
+    BinaryTree();
 	~BinaryTree();
-	Node * getRoot(){return root;}
-    void buildTree(std::vector<int>arr);
+	Node * getRoot();
+	void setRoot(Node * newRoot);
+	Node * makeTree(std::vector<int>arr, int from, int n);
 	void printTree(const std::string& prefix, Node* node, bool isLeft);
 };
