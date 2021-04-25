@@ -20,7 +20,8 @@ void BinaryTree::make(vector<int> arr)
 
 void BinaryTree::traversing()
 {
-	TLR(root, 1, 0);
+	vector<vector<int>>positionsOnLevels;
+	TLR(root, 1, positionsOnLevels);
 	cout<<endl;
 }
 
@@ -33,25 +34,36 @@ int BinaryTree::countNodalVerticles()
 
 void BinaryTree::print()
 {
-	root->printTree();
+	if(root!=nullptr)
+		root->printTree();
 }
 
-void BinaryTree::TLR(Node*p, int level, int branch)
+void BinaryTree::TLR(Node*p, int level, vector<vector<int>>&positionsOnLevels)
 {
 	if(p!=nullptr)
 	{
+		int numberBranch=0;
+		if(positionsOnLevels.size()<level)
+		{
+			positionsOnLevels.resize(level);
+		}
+		if(positionsOnLevels[level-1].empty()==true)
+		{
+			numberBranch=1;
+			positionsOnLevels[level-1].push_back(1);
+		}
+		else
+		{
+			numberBranch=positionsOnLevels[level-1].back()+1;
+			positionsOnLevels[level-1].push_back(numberBranch);
+		}
+		
 		if((p->left!=nullptr)||(p->right!=nullptr))
 		{
-			cout<<"Nodal vertex: "<<p->data<<" level: "<<level<<" branch: ";
-			if(branch==0) 
-				cout<<"centre";
-			else if(branch==1)
-				cout<<"left";
-			else cout<<"right";
-			cout<<endl;
+			cout<<"Nodal vertex: "<<setw(3)<<p->data<<" level: "<<setw(3)<<level<<" number of branch: "<<setw(3)<<numberBranch<<endl;
 		}
-		TLR(p->left, level+1, 1);
-		TLR(p->right, level+1, 2);
+		TLR(p->left, level+1, positionsOnLevels);
+		TLR(p->right, level+1, positionsOnLevels);
 	}
 }
 
