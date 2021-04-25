@@ -1,5 +1,4 @@
 ﻿#include "BinaryTree.h"
-
 #include <iomanip>
 #include <stack>
 #include <iostream>
@@ -35,11 +34,6 @@ int BinaryTree::countNodalVerticles()
 void BinaryTree::print()
 {
 	root->printTree();
-}
-
-void BinaryTree::symmetricPrint()
-{
-	symPrintTree(root, 0);
 }
 
 void BinaryTree::TLR(Node*p, int level, int branch)
@@ -82,32 +76,3 @@ Node* BinaryTree::makeTree(std::vector<int> arr, int from, int n)
 	p->right=makeTree(arr, from+1+nl, nr);
 	return p;
 }
-
-void BinaryTree::printTree(const string& prefix, Node* node, bool isLeft) {
-  if (node != nullptr) {
-    cout << prefix;
-    cout << (isLeft ? char(195) : char(192)) << char(196) << char(196);
-    cout << node->data << endl;
-    printTree(prefix + (isLeft ? "|   " : "    "), node->left, true);
-	printTree(prefix + (isLeft ? "|   " : "    "), node->right, false);
-  }
-}
-
-void BinaryTree::symPrintTree(Node* node, int indent)
-{
-	if (node != nullptr) {
-		if(node->right) {
-            symPrintTree(node->right, indent+4);
-        }
-		if (indent) {
-            std::cout << std::setw(indent) << ' ';
-        }
-		if (node->right) std::cout<<" /\n" << std::setw(indent) << ' ';
-		std::cout<< node->data << "\n ";
-		if(node->left) {
-            std::cout << std::setw(indent) << ' ' <<" \\\n";
-            symPrintTree(node->left, indent+4);
-        }
-	}
-}
-
