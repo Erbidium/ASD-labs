@@ -4,8 +4,6 @@
 
 using namespace std;
 
-void printBT(const std::string& prefix, const Node* node, bool isLeft);
-
 BinaryTree::BinaryTree():root(nullptr)
 {}
 
@@ -14,14 +12,14 @@ BinaryTree::~BinaryTree()
 	delete root;
 }
 
-Node* BinaryTree::getRoot()
+void BinaryTree::make(vector<int> arr)
 {
-	return root;
+	root=makeTree(arr, 0, arr.size());
 }
 
-void BinaryTree::setRoot(Node* newRoot)
+void BinaryTree::print()
 {
-	root=newRoot;
+	printTree("", root, false);
 }
 
 Node* BinaryTree::makeTree(std::vector<int> arr, int from, int n)

@@ -17,6 +17,6 @@ int main()
     	arr[i]=temp;
     }
 	BinaryTree currentTree;
-	currentTree.setRoot(currentTree.makeTree(arr, 0, n));
-	currentTree.printTree("", currentTree.getRoot(), false);
+	currentTree.make(arr);
+	currentTree.print();
 }
