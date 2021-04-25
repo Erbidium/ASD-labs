@@ -18,7 +18,7 @@ void BinaryTree::make(vector<int> arr)
 	root=makeTree(arr, 0, arr.size());
 }
 
-void BinaryTree::traversing()
+void BinaryTree::traversal()
 {
 	vector<vector<int>>positionsOnLevels;
 	TLR(root, 1, positionsOnLevels);
@@ -28,7 +28,7 @@ void BinaryTree::traversing()
 int BinaryTree::countNodalVerticles()
 {
 	int numberNodalVerticles=0;
-	counter(root, numberNodalVerticles);
+	counterTLR(root, numberNodalVerticles);
 	return numberNodalVerticles;
 }
 
@@ -67,14 +67,14 @@ void BinaryTree::TLR(Node*p, int level, vector<vector<int>>&positionsOnLevels)
 	}
 }
 
-void BinaryTree::counter(Node* current, int &numberNodalVerticles)
+void BinaryTree::counterTLR(Node* current, int &numberNodalVerticles)
 {
 	if(current!=nullptr)
 	{
 		if((current->left!=nullptr)||(current->right!=nullptr))
 		numberNodalVerticles++;
-		counter(current->left, numberNodalVerticles);
-		counter(current->right, numberNodalVerticles);	
+		counterTLR(current->left, numberNodalVerticles);
+		counterTLR(current->right, numberNodalVerticles);	
 	}
 }
 

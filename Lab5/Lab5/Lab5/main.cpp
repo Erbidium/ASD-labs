@@ -19,6 +19,6 @@ int main()
 	BinaryTree currentTree;
 	currentTree.make(arr);
 	cout<<"Number of nodal verticles: "<<currentTree.countNodalVerticles()<<endl;
-	currentTree.traversing();
+	currentTree.traversal();
 	currentTree.print();
 }
