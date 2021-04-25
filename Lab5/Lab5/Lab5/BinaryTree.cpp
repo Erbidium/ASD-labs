@@ -1,4 +1,6 @@
 ﻿#include "BinaryTree.h"
+
+#include <iomanip>
 #include <stack>
 #include <iostream>
 
@@ -37,7 +39,7 @@ void BinaryTree::print()
 
 void BinaryTree::symmetricPrint()
 {
-	symPrintTree("", root);
+	symPrintTree(root, 0);
 }
 
 void BinaryTree::TLR(Node*p, int level, int branch)
@@ -91,18 +93,56 @@ void BinaryTree::printTree(const string& prefix, Node* node, bool isLeft) {
   }
 }
 
-void BinaryTree::symPrintTree(const std::string &prefix, Node* node)
+void BinaryTree::symPrintTree(Node* node, int indent)
 {
 	if (node != nullptr) {
-		string newStr;
-		for(int i=0;i<prefix.size();i++)
-		{
-			newStr+=' ';
-		}
-		symPrintTree(newStr+" /", node->left);
-		cout << prefix;
-		//cout << (isLeft ? char(195) : char(192)) << char(196) << char(196);
-		cout << node->data << endl;
-		symPrintTree(newStr+" \\", node->right);
+		if(node->right) {
+            symPrintTree(node->right, indent+4);
+        }
+		if (indent) {
+            std::cout << std::setw(indent) << ' ';
+        }
+		if (node->right) std::cout<<" /\n" << std::setw(indent) << ' ';
+		std::cout<< node->data << "\n ";
+		if(node->left) {
+            std::cout << std::setw(indent) << ' ' <<" \\\n";
+            symPrintTree(node->left, indent+4);
+        }
 	}
 }
+
+/*
+void printTree(Node* root, Trunk *prev, bool isLeft)
+{
+    if (root == nullptr) {
+        return;
+    }
+ 
+    string prev_str = "    ";
+    Trunk *trunk = new Trunk(prev, prev_str);
+ 
+    printTree(root->right, trunk, true);
+ 
+    if (!prev) {
+        trunk->str = "———";
+    }
+    else if (isLeft)
+    {
+        trunk->str = ".———";
+        prev_str = "   |";
+    }
+    else {
+        trunk->str = "`———";
+        prev->str = prev_str;
+    }
+ 
+    showTrunks(trunk);
+    cout << root->data << endl;
+ 
+    if (prev) {
+        prev->str = prev_str;
+    }
+    trunk->str = "   |";
+ 
+    printTree(root->left, trunk, false);
+}*/
