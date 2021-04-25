@@ -35,6 +35,11 @@ void BinaryTree::print()
 	printTree("", root, 0);
 }
 
+void BinaryTree::symmetricPrint()
+{
+	symPrintTree("", root);
+}
+
 void BinaryTree::TLR(Node*p, int level, int branch)
 {
 	if(p!=nullptr)
@@ -84,4 +89,20 @@ void BinaryTree::printTree(const string& prefix, Node* node, bool isLeft) {
     printTree(prefix + (isLeft ? "|   " : "    "), node->left, true);
 	printTree(prefix + (isLeft ? "|   " : "    "), node->right, false);
   }
+}
+
+void BinaryTree::symPrintTree(const std::string &prefix, Node* node)
+{
+	if (node != nullptr) {
+		string newStr;
+		for(int i=0;i<prefix.size();i++)
+		{
+			newStr+=' ';
+		}
+		symPrintTree(newStr+" /", node->left);
+		cout << prefix;
+		//cout << (isLeft ? char(195) : char(192)) << char(196) << char(196);
+		cout << node->data << endl;
+		symPrintTree(newStr+" \\", node->right);
+	}
 }

@@ -21,4 +21,5 @@ int main()
 	cout<<"Number of nodal verticles: "<<currentTree.countNodalVerticles()<<endl;
 	currentTree.traversing();
 	currentTree.print();
+	currentTree.symmetricPrint();
 }
