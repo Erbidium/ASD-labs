@@ -17,9 +17,52 @@ void BinaryTree::make(vector<int> arr)
 	root=makeTree(arr, 0, arr.size());
 }
 
+void BinaryTree::traversing()
+{
+	TLR(root, 1, 0);
+	cout<<endl;
+}
+
+int BinaryTree::countNodalVerticles()
+{
+	int numberNodalVerticles=0;
+	counter(root, numberNodalVerticles);
+	return numberNodalVerticles;
+}
+
 void BinaryTree::print()
 {
-	printTree("", root, false);
+	printTree("", root, 0);
+}
+
+void BinaryTree::TLR(Node*p, int level, int branch)
+{
+	if(p!=nullptr)
+	{
+		if((p->left!=nullptr)||(p->right!=nullptr))
+		{
+			cout<<"Nodal vertex: "<<p->data<<" level: "<<level<<" branch: ";
+			if(branch==0) 
+				cout<<"centre";
+			else if(branch==1)
+				cout<<"left";
+			else cout<<"right";
+			cout<<endl;
+		}
+		TLR(p->left, level+1, 1);
+		TLR(p->right, level+1, 2);
+	}
+}
+
+void BinaryTree::counter(Node* current, int &numberNodalVerticles)
+{
+	if(current!=nullptr)
+	{
+		if((current->left!=nullptr)||(current->right!=nullptr))
+		numberNodalVerticles++;
+		counter(current->left, numberNodalVerticles);
+		counter(current->right, numberNodalVerticles);	
+	}
 }
 
 Node* BinaryTree::makeTree(std::vector<int> arr, int from, int n)
