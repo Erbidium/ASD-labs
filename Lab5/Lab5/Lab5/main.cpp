@@ -18,5 +18,5 @@ int main()
     }
 	BinaryTree currentTree;
 	currentTree.buildTree(arr);
-	currentTree.printTree();
+	currentTree.printTree("", currentTree.getRoot(), false);
 }

@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include <string>
 #include <vector>
 #include "Node.h"
 
@@ -8,6 +9,7 @@ class BinaryTree
 public:
     BinaryTree():root(nullptr){}
 	~BinaryTree();
+	Node * getRoot(){return root;}
     void buildTree(std::vector<int>arr);
-	void printTree()const;
+	void printTree(const std::string& prefix, Node* node, bool isLeft);
 };

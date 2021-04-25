@@ -71,21 +71,12 @@ void BinaryTree::buildTree(std::vector<int> arr)
 	}
 }
 
-void BinaryTree::printTree()const
-{
-	printBT("", root, false); 
-	
-}
-
-
-void printBT(const std::string& prefix, const Node* node, bool isLeft)
-{
-    if( node != nullptr )
-    {
-        cout << prefix;
-        cout << (isLeft ? char(195) : char(192)) << char(196) << char(196);
-        cout << node->data << std::endl;
-        printBT(prefix + (isLeft ? "|   " : "    "), node->left, true);
-        printBT(prefix + (isLeft ? "|   " : "    "), node->right, false);
-    }
+void BinaryTree::printTree(const string& prefix, Node* node, bool isLeft) {
+  if (node != nullptr) {
+    cout << prefix;
+    cout << (isLeft ? char(195) : char(192)) << char(196) << char(196);
+    cout << node->data << endl;
+    printTree(prefix + (isLeft ? "|   " : "    "), node->left, true);
+	printTree(prefix + (isLeft ? "|   " : "    "), node->right, false);
+  }
 }
