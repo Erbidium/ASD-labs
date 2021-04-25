@@ -34,7 +34,7 @@ int BinaryTree::countNodalVerticles()
 
 void BinaryTree::print()
 {
-	printTree("", root, 0);
+	root->printTree();
 }
 
 void BinaryTree::symmetricPrint()
@@ -111,38 +111,3 @@ void BinaryTree::symPrintTree(Node* node, int indent)
 	}
 }
 
-/*
-void printTree(Node* root, Trunk *prev, bool isLeft)
-{
-    if (root == nullptr) {
-        return;
-    }
- 
-    string prev_str = "    ";
-    Trunk *trunk = new Trunk(prev, prev_str);
- 
-    printTree(root->right, trunk, true);
- 
-    if (!prev) {
-        trunk->str = "———";
-    }
-    else if (isLeft)
-    {
-        trunk->str = ".———";
-        prev_str = "   |";
-    }
-    else {
-        trunk->str = "`———";
-        prev->str = prev_str;
-    }
- 
-    showTrunks(trunk);
-    cout << root->data << endl;
- 
-    if (prev) {
-        prev->str = prev_str;
-    }
-    trunk->str = "   |";
- 
-    printTree(root->left, trunk, false);
-}*/

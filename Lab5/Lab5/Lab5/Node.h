@@ -1,9 +1,13 @@
 ﻿#pragma once
+#include <iostream>
 
-struct Node
+class Node
 {
+	void printTree(bool isRight, std::string indent);
+public:
     int data;
     Node *left, *right;
     Node(int);
 	~Node();
+	void printTree();
 };
