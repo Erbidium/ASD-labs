@@ -20,7 +20,7 @@ void BinaryTree::make(vector<int> arr)
 
 void BinaryTree::traversal()
 {
-	vector<vector<int>>positionsOnLevels;
+	vector<int>positionsOnLevels;
 	TLR(root, 1, positionsOnLevels);
 	cout<<endl;
 }
@@ -38,25 +38,15 @@ void BinaryTree::print()
 		root->printTree();
 }
 
-void BinaryTree::TLR(Node*p, int level, vector<vector<int>>&positionsOnLevels)
+void BinaryTree::TLR(Node*p, int level, vector<int>&positionsOnLevels)
 {
 	if(p!=nullptr)
 	{
-		int numberBranch=0;
 		if(positionsOnLevels.size()<level)
 		{
-			positionsOnLevels.resize(level);
+			positionsOnLevels.resize(level, 0);
 		}
-		if(positionsOnLevels[level-1].empty()==true)
-		{
-			numberBranch=1;
-			positionsOnLevels[level-1].push_back(1);
-		}
-		else
-		{
-			numberBranch=positionsOnLevels[level-1].back()+1;
-			positionsOnLevels[level-1].push_back(numberBranch);
-		}
+		int numberBranch=++positionsOnLevels[level-1];
 		
 		if((p->left!=nullptr)||(p->right!=nullptr))
 		{

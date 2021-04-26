@@ -6,7 +6,7 @@ class BinaryTree
 {
     Node * root;
 	Node * makeTree(std::vector<int>, int, int);
-	void TLR(Node*, int, std::vector<std::vector<int>>&);
+	void TLR(Node*, int, std::vector<int>&);
 	void counterTLR(Node*, int&);
 public:
     BinaryTree();
