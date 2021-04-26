@@ -12,37 +12,37 @@ Node::~Node()
 
 void Node::printTree()
 {
+	if (left != nullptr) {
+    	left->printTree(false, "");
+    }
+	
+	cout<<data<<"\n";
+
 	if(right != nullptr) {
 		right->printTree(true, "");
 	}
-	
-	cout<<data<<"\n";
-	
-    if (left != nullptr) {
-    	left->printTree(false, "");
-    }
 }
 
 void Node::printTree(bool isRight, string indent)
 {
-    if(right!=nullptr)
+    if(left!=nullptr)
     {
-        right->printTree(true, indent+(isRight?"        ":" |      "));
+        left->printTree(false, indent+(isRight?" |      ":"        "));
     }
 	
     cout<<indent;
     if(isRight)
     {
-        cout<<" /";
+    	cout<<" \\";
     }
 	else
     {
-        cout<<" \\";
+		cout<<" /";
     }
     cout<<"----- "<<data<<"\n";
 	
-    if(left!=nullptr)
+    if(right!=nullptr)
     {
-        left->printTree(false, indent+(isRight?" |      ":"        "));
+        right->printTree(true, indent+(isRight?"        ":" |      "));
     }
 }
