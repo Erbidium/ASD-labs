@@ -1,20 +1,22 @@
-﻿#include <algorithm>
-#include <iostream>
+﻿#include <iostream>
 #include <vector>
 #include <ctime>
 #include <fstream>
-#include <cmath>
 
 using namespace std;
 
-vector<int> getArrayFromUser(vector<int>&array);
+vector<int> getArrayFromUser();
 void shellSort(vector<int>&array);
+//vector<int> getPrattSequence(int arraySize);
 vector<int> getPrattSequence(int arraySize);
+bool isGreater(int param1, int param2, int&counter);
+bool isGreaterOrEquals(int param1, int param2, int&counter);
+void printArray(vector<int>array);
 
 int main()
 {
 	srand(time(NULL));
-    vector<int>array=getArrayFromUser(array);
+    vector<int>array=getArrayFromUser();
 	int arraySize=array.size();
 	ofstream outArray("arrayBeforeSort.txt");
 	for(int i=0;i<arraySize;i++)
@@ -23,7 +25,12 @@ int main()
 	}
 	outArray<<endl;
 	outArray.close();
+	cout<<"Before sort: "<<endl;
+	printArray(array);
+	cout<<endl;
 	shellSort(array);
+	cout<<endl<<"After sort: "<<endl;
+	printArray(array);
 	ofstream outResults("arraySorted.txt");
 	for(int i=0;i<arraySize;i++)
 	{
@@ -35,13 +42,13 @@ int main()
 
 vector<int> getArrayFromUser()
 {
-	vector<int> array;
 	cout<<"Generate sequence(0) Manual array input(1): ";
 	int choice;
 	cin>>choice;
 	cout<<"Enter size of array: ";
 	int arraySize;
 	cin>>arraySize;
+	vector<int> array(arraySize);
 	if(choice==0)
 	{
 		cout<<"Random numbers(0) Ordered array(1) Reverse ordered array(2): ";
@@ -109,8 +116,39 @@ vector<int> getPrattSequence(int arraySize)
 
 vector<int> getPrattSequence(int arraySize)
 {
-	vector<int> prattSequence;
-	
+	int minimal=-1;
+	bool wasNewElement=false;
+	vector<int> prattSequence(1, 1);
+	do
+	{
+		wasNewElement=false;
+		minimal=-1;
+		for(int i=0;i<prattSequence.size();i++)
+		{
+			if((prattSequence[i]*2<=arraySize/2)&&(prattSequence[i]*2>prattSequence[prattSequence.size()-1]))
+			{
+				if((minimal==-1)||(prattSequence[i]*2<minimal))
+					minimal=2*prattSequence[i];
+			}
+			if((prattSequence[i]*3<=arraySize/2)&&(prattSequence[i]*3>prattSequence[prattSequence.size()-1]))
+			{
+				if((minimal==-1)||(prattSequence[i]*3<minimal))
+					minimal=3*prattSequence[i];
+			}
+		}
+		if(minimal!=-1)
+		{
+			prattSequence.push_back(minimal);
+			wasNewElement=true;
+		}
+	}
+	while(wasNewElement==true);
+	cout<<"Pratt sequence2: "<<endl;
+	for(int i=0;i<prattSequence.size();i++)
+	{
+		cout<<prattSequence[i]<<' ';
+	}
+	cout<<endl;
 	return prattSequence;
 }
 
@@ -126,7 +164,7 @@ void shellSort(vector<int>&array)
 			numberOfComparisons++;
 			int temp=array[i];
 			int j=i;
-			while(((j>=prattSequence[k])&&(++numberOfComparisons)) && ((array[j - prattSequence[k]]> temp)&&(++numberOfComparisons)))
+			while(isGreaterOrEquals(j, prattSequence[k],numberOfComparisons) && isGreater(array[j - prattSequence[k]],  temp, numberOfComparisons))
 			{
 				numberOfExchanges++;
 				array[j] = array[j - prattSequence[k]];
@@ -135,5 +173,26 @@ void shellSort(vector<int>&array)
             array[j] = temp;
 		}
 	}
-	cout<<endl<<numberOfExchanges+numberOfComparisons<<endl;
+	cout<<"Number of exhanges: "<<numberOfExchanges<<endl;
+	cout<<"Number of comparisons: "<<numberOfComparisons<<endl;
+}
+
+bool isGreater(int param1, int param2, int&counter)
+{
+	counter++;
+	return (param1>param2)?true:false;
+}
+bool isGreaterOrEquals(int param1, int param2, int&counter)
+{
+	counter++;
+	return (param1>=param2)?true:false;
+}
+
+void printArray(vector<int>array)
+{
+	for(int i=0;i<array.size();i++)
+	{
+		cout<<array[i]<<' ';
+	}
+	cout<<endl;
 }
