@@ -89,30 +89,6 @@ vector<int> getArrayFromUser()
 	}
 	return array;
 }
-/*
-vector<int> getPrattSequence(int arraySize)
-{
-	int i=0, j=0;
-	vector<int> prattSequence;
-	while((pow(2, i)*pow(3, j)<=arraySize/2))
-	{
-		while(pow(2, i)*pow(3, j)<=arraySize/2)
-		{
-			prattSequence.push_back(pow(2, i)*pow(3, j));
-			j++;
-		}
-		i++;
-		j=0;
-	}
-	sort(prattSequence.begin(), prattSequence.end());
-	cout<<"Pratt sequence: "<<endl;
-	for(int i=0;i<prattSequence.size();i++)
-	{
-		cout<<prattSequence[i]<<' ';
-	}
-	cout<<endl;
-	return prattSequence;
-}*/
 
 vector<int> getPrattSequence(int arraySize)
 {
@@ -158,7 +134,7 @@ void shellSort(vector<int>&array)
 	vector<int>prattSequence=getPrattSequence(size);
 	for(int k=prattSequence.size()-1;k>=0;k--)
 	{
-		numberOfComparisons++;
+		//numberOfComparisons++;
 		for(int i=prattSequence[k];i<size;i++)
 		{
 			numberOfComparisons++;
