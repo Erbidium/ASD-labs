@@ -7,13 +7,14 @@ using namespace std;
 
 void generateFile(const string& fileName, int numberOfElements);
 void directMergeSort(const string& fileA, int numberOfElements);
-void divideSequences(const string& fileA, const string& fileB, const string& fileC, bool& sortIsFinished, int sequenceToFile, int numberOfElements);
-void mergeSequences(const string& fileA, const string& fileB, const string& fileC, int sequenceToFile, int numberOfElements);
+void binaryToTextFile(const string& fileName, int numberOfElements);
+void divideSequences(const string& fileA, const string& fileB, const string& fileC, bool& sortIsFinished, int sequenceToFile, int numberOfElements, int &numBufB, int &numBufC);
+void mergeSequences(const string& fileA, const string& fileB, const string& fileC, int sequenceToFile, int numberOfElements, int numBufB, int numBufC);
 
 int main()
 {
 	srand(time(NULL));
-    cout<<"Generate array(0) Sort array(1): ";
+    cout<<"Generate array(0) Sort array(1) Convert binary to text file(2): ";
 	int choice;
 	cin>>choice;
 	cout<<"Enter number of elements: ";
@@ -24,7 +25,7 @@ int main()
 	cin>>fileName;
 	if(choice==0)
 		generateFile(fileName, numberOfElements);
-	else
+	else if(choice==1)
 	{
 		ifstream inFileA(fileName);
 		if(inFileA.is_open())
@@ -37,6 +38,10 @@ int main()
 			cout<<"Cannot open a file!"<<endl;
 		}
 	}
+	else
+	{
+		binaryToTextFile(fileName, numberOfElements);
+	}
 }
 
 void generateFile(const string& fileName, int numberOfElements)
@@ -45,7 +50,7 @@ void generateFile(const string& fileName, int numberOfElements)
 	for(int i=0;i<numberOfElements;i++)
 	{
 		int number=rand()%1000000;
-		outFile.write((char*)&number, sizeof(int));
+		outFile.write(reinterpret_cast<char*>(&number), sizeof(int));
 	}
 	outFile.close();
 }
@@ -53,68 +58,102 @@ void generateFile(const string& fileName, int numberOfElements)
 void directMergeSort(const string& fileA, int numberOfElements)
 {
 	string fileB=fileA;
-	string fileC=fileB;
+	string fileC=fileA;
 	int dotPos=fileA.find('.');
 	fileB.insert(dotPos, "B");
 	fileC.insert(dotPos, "C");
-	const int chunkSize=65536;
+	const int chunkSize=262144;
 	int *array=new int[chunkSize];
 	ifstream inFileA(fileA);
 	int i=0;
 	while(i<numberOfElements)
 	{
 		int readBufLength=min(chunkSize, numberOfElements-i);
-		inFileA.read((char*)array, readBufLength*sizeof(int));
+		inFileA.read(reinterpret_cast<char*>(array), readBufLength*sizeof(int));
 		sort(array, array+readBufLength);
 		i+=readBufLength;
-		cout<<"i: "<<i<<endl;
+		//cout<<"i: "<<i<<endl;
 	}
 	delete[] array;
 	int sequenceToFile=chunkSize;
 	bool sortIsFinished=false;
 	do
 	{
-		divideSequences(fileA, fileB, fileC, sortIsFinished, sequenceToFile, numberOfElements);
+		int numBufB=0, numBufC=0;
+		divideSequences(fileA, fileB, fileC, sortIsFinished, sequenceToFile, numberOfElements, numBufB, numBufC);
 		if(!sortIsFinished)
-			mergeSequences(fileA, fileB, fileC, sequenceToFile, numberOfElements);
+			mergeSequences(fileA, fileB, fileC, sequenceToFile, numberOfElements, numBufB, numBufC);
 		sequenceToFile*=2;
 	}
 	while(!sortIsFinished);
 }
 
-void divideSequences(const string& fileA, const string& fileB, const string& fileC, bool& sortIsFinished, int sequenceToFile, int numberOfElements)
+void binaryToTextFile(const string& fileName,int numberOfElements)
+{
+	ifstream inFile(fileName, ios::binary);
+	int dotPos=fileName.find('.');
+	string textFile=fileName;
+	textFile.erase(dotPos);
+	textFile.insert(dotPos, "Text.txt");
+	ofstream outTxt(textFile);
+	for(int i=0;i<numberOfElements;i++)
+	{
+		int tempValue;
+		inFile.read(reinterpret_cast<char*>(&tempValue), sizeof(int));
+		outTxt<<tempValue<<" ";
+	}
+	inFile.close();
+	outTxt.close();
+}
+
+void divideSequences(const string& fileA, const string& fileB, const string& fileC, bool& sortIsFinished, int sequenceToFile, int numberOfElements, int &numBufB, int &numBufC)
 {
 	cout<<"divide"<<endl;
 	ifstream inFileA(fileA, ios::binary);
 	ofstream outFileB(fileB, ios::trunc|ios::binary);
 	ofstream outFileC(fileC, ios::trunc|ios::binary);
-	const int chunkSize=65536;
-	int *buffer=new int[chunkSize];
-	int indexInBuffer=0;
-	int currentBufferASize=min(chunkSize, numberOfElements);
-	inFileA.read((char*)buffer, currentBufferASize*sizeof(int));
-	int i=0, sequenceBLength=0, sequenceCLength=0;
+	const int chunkSize=262144;
+	int currentBufferASize=min(numberOfElements, chunkSize);
+	int currentBufferBSize= chunkSize;
+	int currentBufferCSize= chunkSize;
+	int *bufferA=new int[chunkSize];
+	int *bufferB=new int[chunkSize];
+	int *bufferC=new int[chunkSize];
+	int indexInBufferA=0, indexInBufferB=0, indexInBufferC=0;
+	inFileA.read(reinterpret_cast<char*>(bufferA), currentBufferASize*sizeof(int));
+	int posInA=0, sequenceBLength=0, sequenceCLength=0;
+	int posInB=0, posInC=0;
 	do
 	{
 		int iterations=0;
 		//cout<<"b: ";
 		int tempB=0;
 		sortIsFinished=false;
-		while((sequenceToFile!=iterations)&&(i<numberOfElements))
+		while((sequenceToFile!=iterations)&&(posInA<numberOfElements))
 		{
-			tempB=buffer[indexInBuffer];
-			indexInBuffer++;
-			if(indexInBuffer==currentBufferASize)
+			tempB=bufferA[indexInBufferA];
+			indexInBufferA++;
+			if(indexInBufferA==currentBufferASize)
 			{
-				indexInBuffer=0;
-				inFileA.read((char*)buffer, currentBufferASize*sizeof(int));
-				currentBufferASize=min(chunkSize, numberOfElements-i);
+				indexInBufferA=0;
+				currentBufferASize=min(chunkSize, numberOfElements-posInA);
+				inFileA.read(reinterpret_cast<char*>(bufferA), currentBufferASize*sizeof(int));
 			}
-			outFileB.write((char*)&tempB, sizeof(int));
+			
+			bufferB[indexInBufferB]=tempB;
+			indexInBufferB++;
+			posInB++;
+			if(indexInBufferB==chunkSize)
+			{
+				indexInBufferB=0;
+				outFileB.write(reinterpret_cast<char*>(bufferB), currentBufferBSize*sizeof(int));
+			}
+			
+			numBufB++;
 			//cout<<tempB<<" ";
 			iterations++;
 			sequenceBLength++;
-			i++;
+			posInA++;
 		}
 		if((sequenceBLength==numberOfElements)||(sequenceCLength==numberOfElements))
 			sortIsFinished=true;
@@ -125,18 +164,27 @@ void divideSequences(const string& fileA, const string& fileB, const string& fil
 			iterations=0;
 			int tempC=0;
 			
-			while((sequenceToFile!=iterations)&&(i<numberOfElements))
+			while((sequenceToFile!=iterations)&&(posInA<numberOfElements))
 			{
-				tempB=buffer[indexInBuffer];
-				indexInBuffer++;
-				if(indexInBuffer==currentBufferASize)
+				tempC=bufferA[indexInBufferA];
+				indexInBufferA++;
+				if(indexInBufferA==currentBufferASize)
 				{
-					indexInBuffer=0;
-					inFileA.read((char*)buffer, currentBufferASize*sizeof(int));
-					currentBufferASize=min(chunkSize, numberOfElements-i);
+					indexInBufferA=0;
+					currentBufferASize=min(chunkSize, numberOfElements-posInA);
+					inFileA.read(reinterpret_cast<char*>(bufferA), currentBufferASize*sizeof(int));
 				}
-				outFileC.write((char*)&tempC, sizeof(int));
-				i++;
+
+				bufferC[indexInBufferC]=tempC;
+				indexInBufferC++;
+				if(indexInBufferC==chunkSize)
+				{
+					indexInBufferC=0;
+					outFileC.write(reinterpret_cast<char*>(bufferC), currentBufferCSize*sizeof(int));
+				}
+				numBufC++;
+				posInC++;
+				posInA++;
 				//cout<<tempC<<" ";
 				iterations++;
 				sequenceCLength++;
@@ -144,34 +192,64 @@ void divideSequences(const string& fileA, const string& fileB, const string& fil
 			//cout<<endl;
 		}
 	}
-	while(i<numberOfElements);
-	delete[] buffer;
+	while(posInA<numberOfElements);
+	if(indexInBufferB>0)
+		outFileB.write(reinterpret_cast<char*>(bufferB), indexInBufferB*sizeof(int));
+	if(indexInBufferC>0)
+		outFileC.write(reinterpret_cast<char*>(bufferC), indexInBufferC*sizeof(int));
+	delete[] bufferA;
+	delete[] bufferB;
+	delete[] bufferC;
 	inFileA.close();
 	outFileB.close();
 	outFileC.close();
 }
 
-void mergeSequences(const string& fileA, const string& fileB, const string& fileC, int sequenceToFile, int numberOfElements)
+void mergeSequences(const string& fileA, const string& fileB, const string& fileC, int sequenceToFile, int numberOfElements, int numBufB, int numBufC)
 {
 	cout<<"merge: "<<endl;
-	ofstream outFileA(fileA, ios::trunc);
-	ifstream inFileB(fileB), inFileC(fileC);
+	ofstream outFileA(fileA, ios::trunc|ios::binary);
+	ifstream inFileB(fileB, ios::binary), inFileC(fileC, ios::binary);
 	int indexOfMergedB=0, indexOfMergedC=0;
 	int tempB=0, tempC=0;
-	const int chunkSize=65536;
-	int indexInBufferA=0;
-	int i=0;
-	int currentBufferASize=min(numberOfElements-i, chunkSize);
-	int *bufferA=new int[currentBufferASize];
+	const int chunkSize=262144;
+	int indexInBufferA=0, indexInBufferB=0, indexInBufferC=0;
+	int posInA=0, posInB=0, posInC=0;
+	int currentBufferASize=min(numberOfElements, chunkSize);
+	int currentBufferBSize=min(numBufB, chunkSize);
+	int currentBufferCSize=min(numBufC, chunkSize);
+	int *bufferA=new int[chunkSize];
+	int *bufferB=new int[chunkSize];
+	int *bufferC=new int[chunkSize];
+	inFileB.read(reinterpret_cast<char*>(bufferB), currentBufferBSize*sizeof(int));
+	inFileC.read(reinterpret_cast<char*>(bufferC), currentBufferCSize*sizeof(int));
 	bool wasReadB=false, wasReadC=false;
 	do
 	{
-		if((wasReadB==false)&&(inFileB.read((char*)&tempB, sizeof(int))))
+		if((wasReadB==false)&&(posInB<numBufB))
 		{
+			posInB++;
+			tempB=bufferB[indexInBufferB];
+			indexInBufferB++;
+			if(indexInBufferB==currentBufferBSize)
+			{
+				indexInBufferB=0;
+				currentBufferBSize=min(chunkSize, numBufB-posInB);
+				inFileB.read(reinterpret_cast<char*>(bufferB), currentBufferBSize*sizeof(int));
+			}
 			wasReadB=true;
 		}
-		if((wasReadC==false)&&(inFileC.read((char*)&tempC, sizeof(int))))
+		if((wasReadC==false)&&(posInC<numBufC))
 		{
+			posInC++;
+			tempC=bufferC[indexInBufferC];
+			indexInBufferC++;
+			if(indexInBufferC==currentBufferCSize)
+			{
+				indexInBufferC=0;
+				currentBufferCSize=min(chunkSize, numBufC-posInC);
+				inFileC.read(reinterpret_cast<char*>(bufferC), currentBufferCSize*sizeof(int));
+			}
 			wasReadC=true;
 		}
 		if((wasReadB==false)&&(wasReadC==false))
@@ -183,13 +261,13 @@ void mergeSequences(const string& fileA, const string& fileB, const string& file
 			{
 				bufferA[indexInBufferA]=tempB;
 				indexInBufferA++;
+				posInA++;
 				if(indexInBufferA==currentBufferASize)
 				{
 					indexInBufferA=0;
-					outFileA.write((char*)bufferA, currentBufferASize*sizeof(int));
-					currentBufferASize=min(chunkSize, numberOfElements-i);
+					outFileA.write(reinterpret_cast<char*>(bufferA), currentBufferASize*sizeof(int));
+					currentBufferASize=min(chunkSize, numberOfElements-posInA);
 				}
-				i++;
 				//cout<<" b "<<tempB;
 				wasReadB=false;
 				indexOfMergedB++;
@@ -198,13 +276,13 @@ void mergeSequences(const string& fileA, const string& fileB, const string& file
 			{
 				bufferA[indexInBufferA]=tempC;
 				indexInBufferA++;
+				posInA++;
 				if(indexInBufferA==currentBufferASize)
 				{
 					indexInBufferA=0;
-					outFileA.write((char*)bufferA, currentBufferASize*sizeof(int));
-					currentBufferASize=min(chunkSize, numberOfElements-i);
+					outFileA.write(reinterpret_cast<char*>(bufferA), currentBufferASize*sizeof(int));
+					currentBufferASize=min(chunkSize, numberOfElements-posInA);
 				}
-				i++;
 				//cout<<" c "<<tempC;
 				wasReadC=false;
 				indexOfMergedC++;
@@ -219,13 +297,13 @@ void mergeSequences(const string& fileA, const string& fileB, const string& file
 		{
 			bufferA[indexInBufferA]=tempC;
 			indexInBufferA++;
+			posInA++;
 			if(indexInBufferA==currentBufferASize)
 			{
 				indexInBufferA=0;
-				outFileA.write((char*)bufferA, currentBufferASize*sizeof(int));
-				currentBufferASize=min(chunkSize, numberOfElements-i);
+				outFileA.write(reinterpret_cast<char*>(bufferA), currentBufferASize*sizeof(int));
+				currentBufferASize=min(chunkSize, numberOfElements-posInA);
 			}
-			i++;
 			//cout<<" c "<<tempC;
 			wasReadC=false;
 			indexOfMergedC++;
@@ -234,21 +312,26 @@ void mergeSequences(const string& fileA, const string& fileB, const string& file
 		{
 			bufferA[indexInBufferA]=tempB;
 			indexInBufferA++;
-			i++;
+			posInA++;
 			if(indexInBufferA==currentBufferASize)
 			{
 				indexInBufferA=0;
-				outFileA.write((char*)bufferA, currentBufferASize*sizeof(int));
-				currentBufferASize=min(chunkSize, numberOfElements-i);
+				outFileA.write(reinterpret_cast<char*>(bufferA), currentBufferASize*sizeof(int));
+				currentBufferASize=min(chunkSize, numberOfElements-posInA);
 			}
 			//cout<<" b "<<tempB;
 			wasReadB=false;
 			indexOfMergedB++;
 		}
 	}
-	while((!inFileB.eof())||(!inFileC.eof()));
+	while(numberOfElements!=posInA);
 	if(indexInBufferA>0)
-		outFileA.write((char*)bufferA, currentBufferASize);
+		outFileA.write(reinterpret_cast<char*>(bufferA), indexInBufferA*sizeof(int));
 	delete[]bufferA;
+	delete[]bufferB;
+	delete[]bufferC;
+	outFileA.close();
+	inFileB.close();
+	inFileC.close();
 	//cout<<endl;
 }

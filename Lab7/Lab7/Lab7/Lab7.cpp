@@ -55,7 +55,7 @@ void directMergeSort(const string& fileA, int numberOfElements)
 	int dotPos=fileA.find('.');
 	fileB.insert(dotPos, "B");
 	fileC.insert(dotPos, "C");
-	int sequenceToFile=1;
+	int sequenceToFile=4;
 	bool sortIsFinished=false;
 	do
 	{
