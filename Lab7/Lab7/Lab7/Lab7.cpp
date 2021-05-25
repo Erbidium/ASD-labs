@@ -76,14 +76,12 @@ void divideSequences(const string& fileA, const string& fileB, const string& fil
 	do
 	{
 		int iterations=0;
-		//cout<<"b: ";
 		int tempB=0;
 		sortIsFinished=false;
 		while((sequenceToFile!=iterations)&&(i<numberOfElements))
 		{
 			inFileA>>tempB;
 			outFileB<<tempB<<" ";
-			//cout<<tempB<<" ";
 			iterations++;
 			sequenceBLength++;
 			i++;
@@ -92,20 +90,16 @@ void divideSequences(const string& fileA, const string& fileB, const string& fil
 			sortIsFinished=true;
 		else
 		{
-			//cout<<endl;
-			//cout<<"c: ";
 			iterations=0;
 			int tempC=0;
 			while((sequenceToFile!=iterations)&&(i<numberOfElements))
 			{
 				inFileA>>tempC;
 				outFileC<<tempC<<" ";
-				//cout<<tempC<<" ";
 				iterations++;
 				sequenceCLength++;
 				i++;
 			}
-			//cout<<endl;
 		}
 	}
 	while(i<numberOfElements);
@@ -116,7 +110,6 @@ void divideSequences(const string& fileA, const string& fileB, const string& fil
 
 void mergeSequences(const string& fileA, const string& fileB, const string& fileC, int sequenceToFile)
 {
-	//cout<<"merge: "<<endl;
 	ofstream outFileA(fileA, ios::trunc);
 	ifstream inFileB(fileB), inFileC(fileC);
 	int indexOfMergedB=0, indexOfMergedC=0;
@@ -134,20 +127,17 @@ void mergeSequences(const string& fileA, const string& fileB, const string& file
 		}
 		if((wasReadB==false)&&(wasReadC==false))
 			break;
-		//cout<<"loop";
 		if((indexOfMergedB<sequenceToFile)&&(indexOfMergedC<sequenceToFile)&&(wasReadB==true)&&(wasReadC==true))
 		{
 			if(tempB<=tempC)
 			{
 				outFileA<<tempB<<" ";
-				//cout<<" b "<<tempB;
 				wasReadB=false;
 				indexOfMergedB++;
 			}
 			else if(tempB>tempC)
 			{
 				outFileA<<tempC<<" ";
-				//cout<<" c "<<tempC;
 				wasReadC=false;
 				indexOfMergedC++;
 			}
@@ -160,18 +150,15 @@ void mergeSequences(const string& fileA, const string& fileB, const string& file
 		else if((indexOfMergedB==sequenceToFile)||((wasReadB==false)&&(wasReadC==true)))
 		{
 			outFileA<<tempC<<" ";
-			//cout<<" c "<<tempC;
 			wasReadC=false;
 			indexOfMergedC++;
 		}
 		else if((indexOfMergedC==sequenceToFile)||((wasReadC==false)&&((wasReadB==true))))
 		{
 			outFileA<<tempB<<" ";
-			//cout<<" b "<<tempB;
 			wasReadB=false;
 			indexOfMergedB++;
 		}
 	}
 	while((!inFileB.eof())||(!inFileC.eof()));
-	//cout<<endl;
 }
