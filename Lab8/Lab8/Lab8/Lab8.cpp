@@ -4,6 +4,7 @@
 #include <set>
 #include <ctime>
 #include <iomanip>
+#include <fstream>
 
 
 using namespace std;
@@ -100,7 +101,7 @@ public:
             delete newData[i];
         }
     }
-    bool insert(pair<string, string> value)
+    void insert(pair<string, string> value)
     {
         if (size + 1 > (int)(resizeKoef * maxSize))
             resize();
@@ -116,19 +117,23 @@ public:
             data[(h1+h2*i)%maxSize]=new pairTable(value);
             size++;
         }  
-        return true;
     }
     
-    bool find(string key)
+    bool find(string key, string&value, int &numberOfComparisons)
     {
+        numberOfComparisons=0;
 	    unsigned int h1 = MurmurHash2A(key.data(),key.size(), maxSize);
         unsigned int h2 = 1+MurmurHash2A(key.data(),key.size()-1, maxSize);
         h2=h2+((h2%2)?0:1);
     	int i=0;
     	while((data[(h1+h2*i)%maxSize]!=nullptr)&&(i<maxSize))
         {
+            numberOfComparisons++;
             if(data[(h1+h2*i)%maxSize]->first==key)
+            {
+                value=data[(h1+h2*i)%maxSize]->second;
                 return true;
+            }
             i++;
         }
     	return false;
@@ -150,15 +155,32 @@ int main()
     srand(time(NULL));
     keyAndValueGenerator newGen;
     hashTable myTable;
-    vector<string>keys;
-    for(int i=0;i<500;i++)
+    int numberOfElements;
+    cout<<"Enter number of elements in hash table: ";
+    cin>>numberOfElements;
+    cout<<"Enter name of file: ";
+    string fileName;
+    cin>>fileName;
+    ofstream outFile(fileName);
+    for(int i=0;i<numberOfElements;i++)
     {
         auto newPair=newGen.generateNewPair();
+        outFile<<i<<' '<<newPair.first<<' '<<newPair.second<<endl;
         myTable.insert(newPair);
-        keys.push_back(newPair.first);
     }
-    //myTable.print();
-    cout<<myTable.getSize()<<endl;
-    //cout<<myTable.getMaxSize()<<endl;
-    cout<<(myTable.find(keys[30])?"yes":"false");
+    outFile.close();
+    string foundValue;
+    int numberOfComparisons;
+    string key;
+    cout<<"Enter key, which you want to find: ";
+    cin>>key;
+    if(myTable.find(key, foundValue, numberOfComparisons))
+    {
+        cout<<"key: "<<key<<" value: "<<foundValue<<endl;
+        cout<<"Number of comparisons: "<<numberOfComparisons<<endl;
+    }
+    else
+    {
+        cout<<"Not found!\n";
+    }
 }
