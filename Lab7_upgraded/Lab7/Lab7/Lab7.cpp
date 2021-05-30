@@ -48,7 +48,7 @@ int main()
 void generateFile(const string& fileName, int numberOfElements)
 {
 	ofstream outFile(fileName, ios::binary);
-	const int chunkSize=26214400;
+	const int chunkSize=262144;
 	int *array=new int[chunkSize];
 	int i=0;
 	while(i<numberOfElements)
@@ -71,7 +71,7 @@ void directMergeSort(const string& fileA, int numberOfElements)
 	int dotPos=fileA.find('.');
 	fileB.insert(dotPos, "B");
 	fileC.insert(dotPos, "C");
-	const int chunkSize=26214400;
+	const int chunkSize=262144;
 	string tempFileName="temp"+fileA;
 	rename(fileA.data(), tempFileName.data());
 	ifstream inFileA(tempFileName, ios::binary);
@@ -116,7 +116,7 @@ void binaryToTextFile(const string& fileName,int numberOfElements)
 	textFile.erase(dotPos);
 	textFile.insert(dotPos, "Text.txt");
 	ofstream outTxt(textFile);
-	const int chunkSize=26214400;
+	const int chunkSize=262144;
 	int *array=new int[chunkSize];
 	int i=0;
 	while(i<numberOfElements)
@@ -139,7 +139,7 @@ void divideSequences(const string& fileA, const string& fileB, const string& fil
 	ifstream inFileA(fileA, ios::binary);
 	ofstream outFileB(fileB, ios::trunc|ios::binary);
 	ofstream outFileC(fileC, ios::trunc|ios::binary);
-	const int chunkSize=26214400;
+	const int chunkSize=262144;
 	int currentBufferASize=min(numberOfElements, chunkSize);
 	int currentBufferBSize= chunkSize;
 	int currentBufferCSize= chunkSize;
@@ -232,7 +232,7 @@ void mergeSequences(const string& fileA, const string& fileB, const string& file
 	ifstream inFileB(fileB, ios::binary), inFileC(fileC, ios::binary);
 	int indexOfMergedB=0, indexOfMergedC=0;
 	int tempB=0, tempC=0;
-	const int chunkSize=26214400;
+	const int chunkSize=262144;
 	int indexInBufferA=0, indexInBufferB=0, indexInBufferC=0;
 	int posInA=0, posInB=0, posInC=0;
 	int currentBufferASize=min(numberOfElements, chunkSize);
